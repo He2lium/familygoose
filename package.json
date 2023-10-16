@@ -1,0 +1,23 @@
+{
+  "name": "familygoose",
+  "version": "1.0.1",
+  "description": "Mongoose plugin for relationships control",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "files": [
+    "dist"
+  ],
+  "devDependencies": {
+    "@types/node": "^20.7.0",
+    "rimraf": "^5.0.5",
+    "typescript": "^5.2.2"
+  },
+  "dependencies": {
+    "mongoose": "^7.6.2"
+  }
+}
