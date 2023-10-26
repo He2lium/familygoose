@@ -1,5 +1,4 @@
-import { Model } from 'mongoose'
-import * as mongoose from 'mongoose'
+import { Model, models } from 'mongoose'
 import { Relationship } from '../../types/Factory'
 
 export const ManyToOneSaveFactory = (
@@ -9,7 +8,7 @@ export const ManyToOneSaveFactory = (
 ): Relationship.PostSaveMiddleware | undefined => {
   if (!foreignField || !localField) return undefined
   return async function (doc) {
-    const foreignModel = mongoose.models[foreignModelName]
+    const foreignModel = doc.$model(foreignModelName)
     const { modelName: localModelName } = doc.constructor as Model<any>
 
     if (!doc.get(localField)) return
