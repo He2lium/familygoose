@@ -9,7 +9,7 @@ import { ManyToOneUpdateFactory, ManyToOneUpdateManyFactory } from './UpdateFact
 export const ManyToOneFactory = (
   foreignModelName: string,
   localField?: string,
-  foreignField?: string
+  foreignField?: string,
 ): ManyToOneMiddlewares => {
   return {
     localField: localField

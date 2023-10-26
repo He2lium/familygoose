@@ -8,18 +8,24 @@ import { ManyToManyUpdateFactory, ManyToManyUpdateManyFactory } from './UpdateFa
 
 export const ManyToManyFactory = (
   foreignModelName: string,
-  localField: string,
-  foreignField: string
+  foreignField: string,
+  localField?: string,
 ): ManyToManyMiddlewares => ({
-  localField: {
-    key: localField,
-    definition: { type: [Schema.Types.ObjectId], default: [], ref: foreignModelName },
-  },
-  postSave: ManyToManySaveFactory(foreignModelName, localField, foreignField),
-  postDelete: ManyToManyDestroyFactory(foreignModelName, localField, foreignField),
+  localField: localField
+    ? {
+        key: localField,
+        definition: {
+          type: [Schema.Types.ObjectId],
+          default: [],
+          ref: foreignModelName,
+        },
+      }
+    : undefined,
+  postSave: ManyToManySaveFactory(foreignModelName, foreignField, localField),
+  postDelete: ManyToManyDestroyFactory(foreignModelName, foreignField, localField),
   preDeleteMany: SaveLocalIdsFactory(),
   postDeleteMany: ManyToManyDestroyManyFactory(foreignModelName, foreignField),
-  postUpdate: ManyToManyUpdateFactory(foreignModelName, localField, foreignField),
+  postUpdate: ManyToManyUpdateFactory(foreignModelName, foreignField, localField),
   preUpdateMany: SaveLocalIdsFactory(),
-  postUpdateMany: ManyToManyUpdateManyFactory(foreignModelName, localField, foreignField),
+  postUpdateMany: ManyToManyUpdateManyFactory(foreignModelName, foreignField, localField),
 })
