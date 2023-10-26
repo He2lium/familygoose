@@ -4,7 +4,7 @@ export const OneToManyDestroyCascadeFactory = (
   foreignModelName: string,
   localField?: string,
   foreignField?: string,
-  cascade: boolean = false
+  cascade: boolean = false,
 ): PreMiddlewareFunction | undefined => {
   return async function (next) {
     // Get models and originalQuery
@@ -38,7 +38,7 @@ export const OneToManyDestroyCascadeFactory = (
 
     // Make ids array unique
     deleteManyIdList = deleteManyIdList.filter(
-      (value, index, array) => array.indexOf(value) === index
+      (value, index, array) => array.indexOf(value) === index,
     )
     const queryFilter: FilterQuery<any> = { _id: { $in: deleteManyIdList } }
     // Delete or update

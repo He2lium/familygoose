@@ -10,12 +10,16 @@ export const OneToManyFactory = (
   foreignModelName: string,
   localField?: string,
   foreignField?: string,
-  cascade: boolean = false
+  cascade: boolean = false,
 ): OneToManyMiddlewares => ({
   localField: localField
     ? {
         key: localField,
-        definition: { type: [Schema.Types.ObjectId], default: [], ref: foreignModelName },
+        definition: {
+          type: [Schema.Types.ObjectId],
+          default: [],
+          ref: foreignModelName,
+        },
       }
     : undefined,
   preDeleteMany: SaveLocalIdsFactory(),
@@ -24,5 +28,5 @@ export const OneToManyFactory = (
   postUpdate: OneToManyUpdateFactory(foreignModelName, localField, foreignField, cascade),
   postUpdateMany: OneToManyUpdateManyFactory(foreignModelName, localField, foreignField, cascade),
   postDelete: OneToManyDestroyFactory(foreignModelName, localField, foreignField, cascade),
-  postDeleteMany: OneToManyDestroyManyFactory(foreignModelName, localField, foreignField, cascade),
+  postDeleteMany: OneToManyDestroyManyFactory(foreignModelName, foreignField, cascade),
 })

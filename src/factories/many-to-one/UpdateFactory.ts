@@ -4,7 +4,7 @@ import { Relationship } from '../../types/Factory'
 export const ManyToOneUpdateFactory = (
   foreignModelName: string,
   localField?: string,
-  foreignField?: string
+  foreignField?: string,
 ): Relationship.PostQueryMiddleware | undefined => {
   if (!foreignField || !localField) return undefined
   return async function (doc) {
@@ -15,7 +15,7 @@ export const ManyToOneUpdateFactory = (
       await foreignModel.updateMany(
         { [foreignField]: doc._id },
         { $pull: { [foreignField]: doc._id } },
-        { initiator: this.model.modelName }
+        { initiator: this.model.modelName },
       )
       return
     }
@@ -24,12 +24,12 @@ export const ManyToOneUpdateFactory = (
     await foreignModel.updateMany(
       { _id: doc.get(localField) },
       { $addToSet: { [foreignField]: doc._id } },
-      { initiator: this.model.modelName }
+      { initiator: this.model.modelName },
     )
     await foreignModel.updateMany(
       { [foreignField]: doc._id, _id: { $ne: doc.get(localField) } },
       { $pull: { [foreignField]: doc._id } },
-      { initiator: this.model.modelName }
+      { initiator: this.model.modelName },
     )
   }
 }
@@ -37,7 +37,7 @@ export const ManyToOneUpdateFactory = (
 export const ManyToOneUpdateManyFactory = (
   foreignModelName: string,
   localField?: string,
-  foreignField?: string
+  foreignField?: string,
 ): Relationship.PostQueryResponseMiddleware | undefined => {
   if (!foreignField || !localField) return undefined
   return async function (_res) {
@@ -51,12 +51,12 @@ export const ManyToOneUpdateManyFactory = (
       await foreignModel.updateMany(
         { _id: this.foreignIds },
         { $addToSet: { [foreignField]: this.localIds } },
-        { initiator: this.model.modelName }
+        { initiator: this.model.modelName },
       )
     await foreignModel.updateMany(
       { [foreignField]: { $in: this.localIds }, _id: { $nin: this.foreignIds } },
       { $pull: { [foreignField]: { $in: this.localIds } } },
-      { initiator: this.model.modelName }
+      { initiator: this.model.modelName },
     )
   }
 }

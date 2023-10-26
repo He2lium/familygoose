@@ -3,7 +3,7 @@ import { FilterQuery, Model, models, PostMiddlewareFunction, Types, UpdateQuery 
 export const ManyToManyUpdateCascadeFactory = (
   foreignModelName: string,
   localField?: string,
-  foreignField?: string
+  foreignField?: string,
 ): PostMiddlewareFunction | undefined => {
   if (!localField || !foreignField) return undefined
   return async function () {

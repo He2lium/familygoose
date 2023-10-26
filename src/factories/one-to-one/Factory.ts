@@ -10,7 +10,7 @@ export const OneToOneFactory = (
   foreignModelName: string,
   localField?: string,
   foreignField?: string,
-  cascade: boolean = false
+  cascade: boolean = false,
 ): OneToManyMiddlewares => {
   return {
     localField: localField

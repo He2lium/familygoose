@@ -5,7 +5,7 @@ export const OneToOneDestroyFactory = (
   foreignModelName: string,
   localField?: string,
   foreignField?: string,
-  cascade: boolean = false
+  cascade: boolean = false,
 ): Relationship.PostQueryMiddleware | undefined => {
   if (!foreignField) return undefined
   return async function (doc) {
@@ -26,7 +26,7 @@ export const OneToOneDestroyFactory = (
       await foreignModel.updateMany(
         queryFilter,
         { $unset: { [foreignField]: true } },
-        { initiator: this.model.modelName }
+        { initiator: this.model.modelName },
       )
     }
   }
@@ -36,7 +36,7 @@ export const OneToOneDestroyManyFactory = (
   foreignModelName: string,
   localField?: string,
   foreignField?: string,
-  cascade: boolean = false
+  cascade: boolean = false,
 ): Relationship.PostQueryResponseMiddleware | undefined => {
   if (!localField && !foreignField) return undefined
   return async function (_res) {
@@ -60,7 +60,7 @@ export const OneToOneDestroyManyFactory = (
       await foreignModel.updateMany(
         queryFilter,
         { $unset: { [foreignField]: true } },
-        { initiator: this.model.modelName }
+        { initiator: this.model.modelName },
       )
     }
   }

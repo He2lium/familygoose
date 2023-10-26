@@ -3,7 +3,7 @@ import { FilterQuery, Model, models, PreMiddlewareFunction, Types } from 'mongoo
 export const ManyToManyDestroyCascadeFactory = (
   foreignModelName: string,
   localField?: string,
-  foreignField?: string
+  foreignField?: string,
 ): PreMiddlewareFunction | undefined => {
   if (!localField || !foreignField) return undefined
   return async function (next) {
@@ -38,14 +38,14 @@ export const ManyToManyDestroyCascadeFactory = (
 
     // Make ids array unique
     updateManyIdList = updateManyIdList.filter(
-      (value, index, array) => array.indexOf(value) === index
+      (value, index, array) => array.indexOf(value) === index,
     )
     const queryFilter: FilterQuery<any> = { _id: { $in: updateManyIdList } }
 
     await foreignModel.updateMany(
       queryFilter,
       { $pull: { [foreignField]: { $in: updateManyIdList } } },
-      { multi: true }
+      { multi: true },
     )
 
     return next()
