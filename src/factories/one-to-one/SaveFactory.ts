@@ -5,11 +5,11 @@ export const OneToOneSaveFactory = (
   foreignModelName: string,
   localField?: string,
   foreignField?: string,
-  cascade: boolean = false,
+  cascade: boolean = false
 ): Relationship.PostSaveMiddleware | undefined => {
   if (!localField || !foreignField) return undefined
   return async function (doc) {
-    const foreignModel = models[foreignModelName]
+    const foreignModel = doc.$model(foreignModelName)
     const { modelName: initiator } = doc.constructor as Model<any>
 
     // Update related documents
@@ -21,19 +21,19 @@ export const OneToOneSaveFactory = (
           _id: { $ne: doc.get(localField) },
           [foreignField]: doc._id,
         },
-        { initiator },
+        { initiator }
       )
     } else {
       await foreignModel.updateMany(
         { _id: { $ne: doc.get(localField) }, [foreignField]: doc._id },
         { $unset: { [foreignField]: true } },
-        { initiator },
+        { initiator }
       )
     }
     await foreignModel.updateMany(
       { _id: doc.get(localField) },
       { $set: { [foreignField]: doc._id } },
-      { initiator },
+      { initiator }
     )
   }
 }
