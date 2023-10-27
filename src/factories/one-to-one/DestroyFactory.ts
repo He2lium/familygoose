@@ -1,4 +1,4 @@
-import { FilterQuery, Types, models } from 'mongoose'
+import { FilterQuery, Types } from 'mongoose'
 import { Relationship } from '../../types/Factory'
 
 export const OneToOneDestroyFactory = (
@@ -33,14 +33,13 @@ export const OneToOneDestroyFactory = (
 }
 
 export const OneToOneDestroyManyFactory = (
-  foreignModelName: string,
   localField?: string,
   foreignField?: string,
   cascade: boolean = false
 ): Relationship.PostQueryResponseMiddleware | undefined => {
   if (!localField && !foreignField) return undefined
   return async function (_res) {
-    const foreignModel = this.mongooseCollection.conn.models[foreignModelName]
+    if (this.getOptions().initiator === this.foreignModel.modelName) return
 
     const queryFilter: FilterQuery<any> & { $or: FilterQuery<any>[] } = { $or: [] }
 
@@ -51,13 +50,15 @@ export const OneToOneDestroyManyFactory = (
     if (foreignField) queryFilter.$or.push({ [foreignField]: this.localIds })
 
     // Get required status of  relationship field
-    const isRequired = Boolean(foreignField && foreignModel.schema.path(foreignField)?.isRequired)
+    const isRequired = Boolean(
+      foreignField && this.foreignModel.schema.path(foreignField)?.isRequired
+    )
 
     // Update related documents
     if (isRequired || cascade) {
-      await foreignModel.deleteMany(queryFilter, { initiator: this.model.modelName })
+      await this.foreignModel.deleteMany(queryFilter, { initiator: this.model.modelName })
     } else if (foreignField) {
-      await foreignModel.updateMany(
+      await this.foreignModel.updateMany(
         queryFilter,
         { $unset: { [foreignField]: true } },
         { initiator: this.model.modelName }

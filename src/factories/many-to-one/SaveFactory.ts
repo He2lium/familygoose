@@ -1,4 +1,3 @@
-import { Model, models } from 'mongoose'
 import { Relationship } from '../../types/Factory'
 
 export const ManyToOneSaveFactory = (
@@ -9,7 +8,7 @@ export const ManyToOneSaveFactory = (
   if (!foreignField || !localField) return undefined
   return async function (doc) {
     const foreignModel = doc.$model(foreignModelName)
-    const { modelName: localModelName } = doc.constructor as Model<any>
+    const { modelName: localModelName } = doc.$model()
 
     if (!doc.get(localField)) return
 

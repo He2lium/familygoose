@@ -1,45 +1,30 @@
-import { FilterQuery, models } from 'mongoose'
 import { Relationship } from '../../types/Factory'
 
 export const ManyToManyDestroyFactory = (
   foreignModelName: string,
-  foreignField: string,
-  localField?: string
-): Relationship.PostQueryMiddleware | undefined => {
-  if (!foreignField) return undefined
-
-  return async function (doc, next) {
+  foreignField: string
+): Relationship.PostQueryMiddleware =>
+  async function (doc, next) {
     const foreignModel = doc.$model(foreignModelName)
-
-    const queryFilter: FilterQuery<any> & { $or: FilterQuery<any>[] } = {
-      $or: [],
-    }
-
-    if (localField) queryFilter.$or.push({ _id: { $in: doc.get(localField) } })
-    queryFilter.$or.push({ [foreignField]: doc._id })
 
     // Update related documents
     await foreignModel.updateMany(
-      queryFilter,
+      { [foreignField]: doc._id },
       { $pull: { [foreignField]: doc._id } },
       { initiator: this.model.modelName }
     )
 
     next()
   }
-}
 
 export const ManyToManyDestroyManyFactory = (
-  foreignModelName: string,
   foreignField: string
 ): Relationship.PostQueryResponseMiddleware =>
   async function (_res, next) {
-    if (this.getOptions().initiator === foreignModelName) return
-
-    const foreignModel = this.mongooseCollection.conn.models[foreignModelName]
+    if (this.getOptions().initiator === this.foreignModel.modelName) return
 
     // Update related documents
-    await foreignModel.updateMany(
+    await this.foreignModel.updateMany(
       { [foreignField]: { $in: this.localIds } },
       { $pull: { [foreignField]: { $in: this.localIds } } },
       { initiator: this.model.modelName }

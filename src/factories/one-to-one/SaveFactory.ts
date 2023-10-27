@@ -1,4 +1,3 @@
-import { Model, models } from 'mongoose'
 import { Relationship } from '../../types/Factory'
 
 export const OneToOneSaveFactory = (
@@ -10,7 +9,7 @@ export const OneToOneSaveFactory = (
   if (!localField || !foreignField) return undefined
   return async function (doc) {
     const foreignModel = doc.$model(foreignModelName)
-    const { modelName: initiator } = doc.constructor as Model<any>
+    const { modelName: initiator } = doc.$model()
 
     // Update related documents
     const isRequired = !!foreignModel.schema.path(foreignField)?.isRequired

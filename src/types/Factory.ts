@@ -10,38 +10,38 @@ import {
 } from 'mongoose'
 
 export namespace Relationship {
-  interface Middlewares {
+  export interface Middlewares {
     localField?: {
       definition: SchemaDefinitionProperty
       key: string
     }
+
+    preQueryWithUpdateResult?: PreQueryMiddleware
+
     postSave?: PostSaveMiddleware
 
     postUpdate?: PostQueryMiddleware
-    preUpdateMany?: PreQueryMiddleware
-    postUpdateMany?: PostQueryResponseMiddleware
+    postUpdateWithUpdateResult?: PostQueryResponseMiddleware
 
     postDelete?: PostQueryMiddleware
-    preDeleteMany?: PreQueryMiddleware
-    postDeleteMany?: PostQueryResponseMiddleware
+    postDeleteWithUpdateResult?: PostQueryResponseMiddleware
   }
-
-  export interface ManyToManyMiddlewares extends Middlewares {}
-  export interface ManyToOneMiddlewares extends Middlewares {}
-  export interface OneToManyMiddlewares extends Middlewares {}
 
   type ExpandedQuery = Query<any, any> & {
-    op?: string
-    foreignIds?: Types.ObjectId[]
-    localIds?: Types.ObjectId[]
-    mongooseCollection: { conn: { models: { [key: string]: Model<any, {}, {}, {}, any, any> } } }
+    localIds: Types.ObjectId[]
+    foreignModel: Model<any>
   }
+
+  type MongooseCollection = { mongooseCollection: Collection }
 
   export type PostSaveMiddleware = PostMiddlewareFunction<
     HydratedDocument<unknown>,
     HydratedDocument<unknown>
   >
-  export type PreQueryMiddleware = PreMiddlewareFunction<ExpandedQuery>
-  export type PostQueryMiddleware = PostMiddlewareFunction<ExpandedQuery, HydratedDocument<unknown>>
+  export type PreQueryMiddleware = PreMiddlewareFunction<ExpandedQuery & MongooseCollection>
+  export type PostQueryMiddleware = PostMiddlewareFunction<
+    Query<any, any>,
+    HydratedDocument<unknown>
+  >
   export type PostQueryResponseMiddleware = PostMiddlewareFunction<ExpandedQuery>
 }

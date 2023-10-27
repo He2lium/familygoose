@@ -1,4 +1,4 @@
-import mongoose, { Types, models } from 'mongoose'
+import { Types } from 'mongoose'
 import { Relationship } from '../../types/Factory'
 
 export const OneToManyUpdateFactory = (
@@ -38,24 +38,21 @@ export const OneToManyUpdateFactory = (
 }
 
 export const OneToManyUpdateManyFactory = (
-  foreignModelName: string,
   localField?: string,
   foreignField?: string,
   cascade: boolean = false
 ): Relationship.PostQueryResponseMiddleware | undefined => {
   if (!localField || !foreignField) return undefined
   return async function (_res) {
-    if (this.getOptions().initiator === foreignModelName) return
-
-    const foreignModel = this.mongooseCollection.conn.models[foreignModelName]
+    if (this.getOptions().initiator === this.foreignModel.modelName) return
 
     // Update related documents
-    const isRequired = !!foreignModel.schema.path(foreignField)?.isRequired
+    const isRequired = !!this.foreignModel.schema.path(foreignField)?.isRequired
 
     const foreignIds = await this.model.distinct<Types.ObjectId>(localField, this.getFilter())
 
     if (isRequired || cascade) {
-      await foreignModel.deleteMany(
+      await this.foreignModel.deleteMany(
         {
           _id: { $nin: foreignIds },
           [foreignField]: this.localIds,
@@ -63,7 +60,7 @@ export const OneToManyUpdateManyFactory = (
         { initiator: this.model.modelName }
       )
     } else {
-      await foreignModel.updateMany(
+      await this.foreignModel.updateMany(
         { _id: { $nin: foreignIds }, [foreignField]: this.localIds },
         { $unset: { [foreignField]: true } },
         { initiator: this.model.modelName }
