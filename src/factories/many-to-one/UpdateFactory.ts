@@ -1,4 +1,4 @@
-import { models, Types } from 'mongoose'
+import { Types } from 'mongoose'
 import { Relationship } from '../../types/Factory'
 
 export const ManyToOneUpdateFactory = (
@@ -35,26 +35,24 @@ export const ManyToOneUpdateFactory = (
 }
 
 export const ManyToOneUpdateManyFactory = (
-  foreignModelName: string,
   localField?: string,
   foreignField?: string
 ): Relationship.PostQueryResponseMiddleware | undefined => {
   if (!foreignField || !localField) return undefined
   return async function (_res) {
-    if (this.getOptions().initiator === foreignModelName) return
-    const foreignModel = this.mongooseCollection.conn.models[foreignModelName]
+    if (this.getOptions().initiator === this.foreignModel.modelName) return
 
-    this.foreignIds = await this.model.distinct<Types.ObjectId>(localField, this.getFilter())
+    const foreignIds = await this.model.distinct<Types.ObjectId>(localField, this.getFilter())
 
     // Update related documents
-    if (this.foreignIds)
-      await foreignModel.updateMany(
-        { _id: this.foreignIds },
+    if (foreignIds)
+      await this.foreignModel.updateMany(
+        { _id: foreignIds },
         { $addToSet: { [foreignField]: this.localIds } },
         { initiator: this.model.modelName }
       )
-    await foreignModel.updateMany(
-      { [foreignField]: { $in: this.localIds }, _id: { $nin: this.foreignIds } },
+    await this.foreignModel.updateMany(
+      { [foreignField]: { $in: this.localIds }, _id: { $nin: foreignIds } },
       { $pull: { [foreignField]: { $in: this.localIds } } },
       { initiator: this.model.modelName }
     )

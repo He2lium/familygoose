@@ -3,29 +3,24 @@ import { Relationship } from '../../types/Factory'
 import { SaveLocalIdsFactory } from '../SaveLocalIds'
 import { ManyToManyDestroyFactory, ManyToManyDestroyManyFactory } from './DestroyFactory'
 import { ManyToManySaveFactory } from './SaveFactory'
-import ManyToManyMiddlewares = Relationship.ManyToManyMiddlewares
 import { ManyToManyUpdateFactory, ManyToManyUpdateManyFactory } from './UpdateFactory'
+import { LocalFieldFactory } from '../LocalFieldFactory'
 
 export const ManyToManyFactory = (
   foreignModelName: string,
   foreignField: string,
-  localField?: string,
-): ManyToManyMiddlewares => ({
-  localField: localField
-    ? {
-        key: localField,
-        definition: {
-          type: [Schema.Types.ObjectId],
-          default: [],
-          ref: foreignModelName,
-        },
-      }
-    : undefined,
+  localField?: string
+): Relationship.Middlewares => ({
+  localField: LocalFieldFactory(localField, {
+    type: [Schema.Types.ObjectId],
+    default: [],
+    ref: foreignModelName,
+  }),
+  preQueryWithUpdateResult: SaveLocalIdsFactory(foreignModelName),
+
   postSave: ManyToManySaveFactory(foreignModelName, foreignField, localField),
-  postDelete: ManyToManyDestroyFactory(foreignModelName, foreignField, localField),
-  preDeleteMany: SaveLocalIdsFactory(),
-  postDeleteMany: ManyToManyDestroyManyFactory(foreignModelName, foreignField),
+  postDelete: ManyToManyDestroyFactory(foreignModelName, foreignField),
+  postDeleteWithUpdateResult: ManyToManyDestroyManyFactory(foreignField),
   postUpdate: ManyToManyUpdateFactory(foreignModelName, foreignField, localField),
-  preUpdateMany: SaveLocalIdsFactory(),
-  postUpdateMany: ManyToManyUpdateManyFactory(foreignModelName, foreignField, localField),
+  postUpdateWithUpdateResult: ManyToManyUpdateManyFactory(foreignField, localField),
 })
