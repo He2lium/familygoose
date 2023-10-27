@@ -4,12 +4,12 @@ import { Relationship } from '../../types/Factory'
 export const ManyToManyDestroyFactory = (
   foreignModelName: string,
   foreignField: string,
-  localField?: string,
+  localField?: string
 ): Relationship.PostQueryMiddleware | undefined => {
   if (!foreignField) return undefined
 
   return async function (doc, next) {
-    const foreignModel = models[foreignModelName]
+    const foreignModel = doc.$model(foreignModelName)
 
     const queryFilter: FilterQuery<any> & { $or: FilterQuery<any>[] } = {
       $or: [],
@@ -22,7 +22,7 @@ export const ManyToManyDestroyFactory = (
     await foreignModel.updateMany(
       queryFilter,
       { $pull: { [foreignField]: doc._id } },
-      { initiator: this.model.modelName },
+      { initiator: this.model.modelName }
     )
 
     next()
@@ -31,18 +31,18 @@ export const ManyToManyDestroyFactory = (
 
 export const ManyToManyDestroyManyFactory = (
   foreignModelName: string,
-  foreignField: string,
+  foreignField: string
 ): Relationship.PostQueryResponseMiddleware =>
   async function (_res, next) {
     if (this.getOptions().initiator === foreignModelName) return
 
-    const foreignModel = models[foreignModelName]
+    const foreignModel = this.mongooseCollection.conn.models[foreignModelName]
 
     // Update related documents
     await foreignModel.updateMany(
       { [foreignField]: { $in: this.localIds } },
       { $pull: { [foreignField]: { $in: this.localIds } } },
-      { initiator: this.model.modelName },
+      { initiator: this.model.modelName }
     )
     next()
   }

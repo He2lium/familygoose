@@ -4,18 +4,18 @@ import { Relationship } from '../../types/Factory'
 export const ManyToOneUpdateFactory = (
   foreignModelName: string,
   localField?: string,
-  foreignField?: string,
+  foreignField?: string
 ): Relationship.PostQueryMiddleware | undefined => {
   if (!foreignField || !localField) return undefined
   return async function (doc) {
-    const foreignModel = models[foreignModelName]
+    const foreignModel = doc.$model(foreignModelName)
 
     if (!doc.get(localField)) {
       // consider the case for { overwrite: true }
       await foreignModel.updateMany(
         { [foreignField]: doc._id },
         { $pull: { [foreignField]: doc._id } },
-        { initiator: this.model.modelName },
+        { initiator: this.model.modelName }
       )
       return
     }
@@ -24,12 +24,12 @@ export const ManyToOneUpdateFactory = (
     await foreignModel.updateMany(
       { _id: doc.get(localField) },
       { $addToSet: { [foreignField]: doc._id } },
-      { initiator: this.model.modelName },
+      { initiator: this.model.modelName }
     )
     await foreignModel.updateMany(
       { [foreignField]: doc._id, _id: { $ne: doc.get(localField) } },
       { $pull: { [foreignField]: doc._id } },
-      { initiator: this.model.modelName },
+      { initiator: this.model.modelName }
     )
   }
 }
@@ -37,12 +37,12 @@ export const ManyToOneUpdateFactory = (
 export const ManyToOneUpdateManyFactory = (
   foreignModelName: string,
   localField?: string,
-  foreignField?: string,
+  foreignField?: string
 ): Relationship.PostQueryResponseMiddleware | undefined => {
   if (!foreignField || !localField) return undefined
   return async function (_res) {
     if (this.getOptions().initiator === foreignModelName) return
-    const foreignModel = models[foreignModelName]
+    const foreignModel = this.mongooseCollection.conn.models[foreignModelName]
 
     this.foreignIds = await this.model.distinct<Types.ObjectId>(localField, this.getFilter())
 
@@ -51,12 +51,12 @@ export const ManyToOneUpdateManyFactory = (
       await foreignModel.updateMany(
         { _id: this.foreignIds },
         { $addToSet: { [foreignField]: this.localIds } },
-        { initiator: this.model.modelName },
+        { initiator: this.model.modelName }
       )
     await foreignModel.updateMany(
       { [foreignField]: { $in: this.localIds }, _id: { $nin: this.foreignIds } },
       { $pull: { [foreignField]: { $in: this.localIds } } },
-      { initiator: this.model.modelName },
+      { initiator: this.model.modelName }
     )
   }
 }

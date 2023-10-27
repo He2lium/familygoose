@@ -1,5 +1,7 @@
 import {
+  Collection,
   HydratedDocument,
+  Model,
   PostMiddlewareFunction,
   PreMiddlewareFunction,
   Query,
@@ -32,6 +34,7 @@ export namespace Relationship {
     op?: string
     foreignIds?: Types.ObjectId[]
     localIds?: Types.ObjectId[]
+    mongooseCollection: { conn: { models: { [key: string]: Model<any, {}, {}, {}, any, any> } } }
   }
 
   export type PostSaveMiddleware = PostMiddlewareFunction<

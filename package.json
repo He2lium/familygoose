@@ -1,6 +1,6 @@
 {
   "name": "familygoose",
-  "version": "1.0.5",
+  "version": "1.0.9",
   "description": "Mongoose plugin for relationships control",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

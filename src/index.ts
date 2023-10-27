@@ -1,14 +1,15 @@
-import { Schema } from 'mongoose'
+export * as mongoose from 'mongoose'
 import { Relationship } from './types/Factory'
 import ManyToOneMiddlewares = Relationship.ManyToOneMiddlewares
 import ManyToManyMiddlewares = Relationship.ManyToManyMiddlewares
 import OneToManyMiddlewares = Relationship.OneToManyMiddlewares
+import { Schema } from 'mongoose'
 
 export { FG } from './utils/RelationshipBuilder'
 
 export const FamilyGoose = <DocType>(
   schema: Schema<DocType & any>,
-  options: (ManyToOneMiddlewares | ManyToManyMiddlewares | OneToManyMiddlewares)[],
+  options: (ManyToOneMiddlewares | ManyToManyMiddlewares | OneToManyMiddlewares)[]
 ) => {
   for (let middlewares of options) {
     // Add local field to schema automatically
