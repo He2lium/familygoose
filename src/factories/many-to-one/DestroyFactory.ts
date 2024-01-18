@@ -19,10 +19,9 @@ export const ManyToOneDestroyFactory = (
 }
 
 export const ManyToOneDestroyManyFactory = (
-  localField?: string,
   foreignField?: string
 ): Relationship.PostQueryResponseMiddleware | undefined => {
-  if (!foreignField || !localField) return undefined
+  if (!foreignField) return undefined
   return async function (_res) {
     if (this.getOptions().initiator === this.foreignModel.modelName) return
 

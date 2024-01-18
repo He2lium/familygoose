@@ -6,7 +6,7 @@ import { OneToOneFactory } from '../factories/one-to-one/Factory'
 export const FG = (foreignModelName: string) => ({
   Many: (foreignField: string) => ({
     toMany: (localField?: string) => ManyToManyFactory(foreignModelName, foreignField, localField),
-    toOne: (localField: string) => ManyToOneFactory(foreignModelName, localField, foreignField),
+    toOne: (localField?: string) => ManyToOneFactory(foreignModelName, localField, foreignField),
   }),
   One: (foreignField: string) => ({
     toMany: (localField?: string, cascade: boolean = false) =>
