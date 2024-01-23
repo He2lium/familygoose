@@ -8,7 +8,7 @@ export const FG = (foreignModelName: string) => ({
     toMany: (localField?: string) => ManyToManyFactory(foreignModelName, foreignField, localField),
     toOne: (localField?: string) => ManyToOneFactory(foreignModelName, localField, foreignField),
   }),
-  One: (foreignField: string) => ({
+  One: (foreignField?: string) => ({
     toMany: (localField?: string, cascade: boolean = false) =>
       OneToManyFactory(foreignModelName, localField, foreignField, cascade),
     toOne: (localField?: string, cascade: boolean = false) =>
