@@ -5,7 +5,7 @@ export { FG } from './utils/RelationshipBuilder'
 
 export const FamilyGoose = <DocType>(
   schema: Schema<DocType & any>,
-  options: Relationship.Middlewares[]
+  options: Relationship.Middlewares[],
 ) => {
   for (const { localField, ...middlewares } of options) {
     // Add local field to schema automatically
@@ -16,7 +16,7 @@ export const FamilyGoose = <DocType>(
     if (middlewares.preQueryWithUpdateResult)
       schema.pre(
         ['deleteMany', 'deleteOne', 'updateMany', 'updateOne'],
-        middlewares.preQueryWithUpdateResult
+        middlewares.preQueryWithUpdateResult,
       )
 
     if (middlewares.postDeleteWithUpdateResult)
@@ -26,7 +26,8 @@ export const FamilyGoose = <DocType>(
     if (middlewares.postSave) schema.post(['save'], middlewares.postSave)
 
     // Set updating generated middlewares
-    if (middlewares.postUpdate) schema.post(['findOneAndUpdate'], middlewares.postUpdate)
+    if (middlewares.postUpdate)
+      schema.post(['findOneAndUpdate', 'findOneAndReplace'], middlewares.postUpdate)
 
     if (middlewares.postUpdateWithUpdateResult)
       schema.post(['updateMany', 'updateOne'], middlewares.postUpdateWithUpdateResult)
