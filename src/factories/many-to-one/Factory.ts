@@ -8,8 +8,8 @@ import { ManyToOneUpdateFactory, ManyToOneUpdateManyFactory } from './UpdateFact
 
 export const ManyToOneFactory = (
   foreignModelName: string,
-  localField: string,
-  foreignField: string
+  localField?: string,
+  foreignField?: string
 ): Relationship.Middlewares => {
   return {
     localField: LocalFieldFactory(localField, {
@@ -21,6 +21,6 @@ export const ManyToOneFactory = (
     postUpdate: ManyToOneUpdateFactory(foreignModelName, localField, foreignField),
     postUpdateWithUpdateResult: ManyToOneUpdateManyFactory(localField, foreignField),
     postDelete: ManyToOneDestroyFactory(foreignModelName, foreignField),
-    postDeleteWithUpdateResult: ManyToOneDestroyManyFactory(localField, foreignField),
+    postDeleteWithUpdateResult: ManyToOneDestroyManyFactory(foreignField),
   }
 }
